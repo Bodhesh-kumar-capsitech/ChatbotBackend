@@ -1,0 +1,128 @@
+﻿[
+  {
+    "query": "How do I apply?",
+    "reply": "You can apply through multiple ways. Choose one:",
+    "options": [
+      {
+        "label": "Online Application",
+        "query": {
+          "query": "Want the online application link?",
+          "reply": "Sure, apply here: https://example.com/apply",
+          "options": []
+        }
+      },
+      {
+        "label": "Offline Application",
+        "query": {
+          "query": "Want the address for offline submission?",
+          "reply": "Visit our office at 123 Main St, CityName.",
+          "options": []
+        }
+      }
+    ]
+  },
+  {
+    "query": "What courses do you offer?",
+    "reply": "We offer a wide range of courses. Pick a category:",
+    "options": [
+      {
+        "label": "Engineering",
+        "query": {
+          "query": "Here are the engineering branches we offer:",
+          "reply": "Computer Science, Mechanical, Electrical, Civil.",
+          "options": []
+        }
+      },
+      {
+        "label": "Business & Management",
+        "query": {
+          "query": "Looking for MBA or BBA?",
+          "reply": "We offer both MBA and BBA programs.",
+          "options": []
+        }
+      },
+      {
+        "label": "Design & Arts",
+        "query": {
+          "query": "We offer:",
+          "reply": "Courses in UI/UX, Graphic Design, and Fine Arts.",
+          "options": []
+        }
+      }
+    ]
+  },
+  {
+    "query": "What are the admission requirements?",
+    "reply": "Admission requirements depend on the program. Select level:",
+    "options": [
+      {
+        "label": "Undergraduate",
+        "query": {
+          "query": "Here are UG requirements:",
+          "reply": "High school diploma, entrance test score, and application form.",
+          "options": []
+        }
+      },
+      {
+        "label": "Postgraduate",
+        "query": {
+          "query": "Here are PG requirements:",
+          "reply": "Bachelor's degree, entrance/interview, and references.",
+          "options": []
+        }
+      }
+    ]
+  },
+  {
+    "query": "What is the fee structure?",
+    "reply": "Fees vary by course type. Choose a stream:",
+    "options": [
+      {
+        "label": "Engineering",
+        "query": {
+          "query": "Engineering fee details:",
+          "reply": "INR 1,50,000 per year + hostel & exam fees.",
+          "options": []
+        }
+      },
+      {
+        "label": "Management",
+        "query": {
+          "query": "Management fee details:",
+          "reply": "INR 2,00,000 per year including project mentorship.",
+          "options": []
+        }
+      }
+    ]
+  },
+  {
+    "query": "How can I contact support?",
+    "reply": "You can contact us in the following ways:",
+    "options": [
+      {
+        "label": "Call",
+        "query": {
+          "query": "Contact number:",
+          "reply": "📞 +91-9876543210 (9 AM - 6 PM)",
+          "options": []
+        }
+      },
+      {
+        "label": "Email",
+        "query": {
+          "query": "Support email:",
+          "reply": "📧 support@example.com",
+          "options": []
+        }
+      },
+      {
+        "label": "Live Chat",
+        "query": {
+          "query": "Start a live chat session?",
+          "reply": "Click the chat icon at the bottom right to begin.",
+          "options": []
+        }
+      }
+    ]
+  }
+]
