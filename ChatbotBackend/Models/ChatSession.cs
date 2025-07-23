@@ -3,15 +3,28 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ChatbotBackend.Models
 {
+    public class ChatTurn
+    {
+        [BsonElement("sender")]
+        public string Sender { get; set; } = string.Empty;
+
+        [BsonElement("message")]
+        public string Message { get; set; } = string.Empty;
+
+        [BsonElement("timestamp")]
+        public DateTime Timestamp { get; set; }
+    }
+
     public class ChatSession
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
+        [BsonElement("SessionId")]
         public string SessionId { get; set; } = string.Empty;
-        public string Query { get; set; } = string.Empty;
-        public string Reply { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+
+        [BsonElement("Conversation")]
+        public List<ChatTurn> Conversation { get; set; } = new();
     }
 }

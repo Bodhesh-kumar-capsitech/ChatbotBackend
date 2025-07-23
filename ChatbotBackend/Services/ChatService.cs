@@ -24,32 +24,89 @@ namespace ChatbotBackend.Services
 
         public async Task<ChatMessage> GetByQueryAsync(string query, string sessionId)
         {
-            var result = await _chatCollection.Find(x => x.Query.ToLower() == query.ToLower()).FirstOrDefaultAsync();
+            // Generate a sessionId if not provided
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                sessionId = Guid.NewGuid().ToString();
+            }
+
+            // Try direct match first
+            var result = await _chatCollection
+                .Find(x => x.Query.ToLowerInvariant() == query.ToLowerInvariant())
+                .FirstOrDefaultAsync();
+
+            // If not found, search recursively through nested options
+            if (result == null)
+            {
+                var allMessages = await _chatCollection.Find(_ => true).ToListAsync();
+
+                foreach (var message in allMessages)
+                {
+                    result = SearchNestedQuery(message, query);
+                    if (result != null)
+                        break;
+                }
+            }
 
             var reply = result?.Reply ?? "Sorry, I couldn't find an answer for that.";
 
             // Log the session
-            var sessionEntry = new ChatSession
+            var filter = Builders<ChatSession>.Filter.Eq(s => s.SessionId, sessionId);
+
+            var customerTurn = new ChatTurn
             {
-                SessionId = sessionId,
-                Query = query,
-                Reply = reply,
+                Sender = "customer",
+                Message = query,
                 Timestamp = DateTime.UtcNow
             };
 
-           // await _sessionCollection.InsertOneAsync(sessionEntry);
+            var botTurn = new ChatTurn
+            {
+                Sender = "bot",
+                Message = reply,
+                Timestamp = DateTime.UtcNow
+            };
+
+            var update = Builders<ChatSession>.Update.PushEach("Conversation", new[] { customerTurn, botTurn });
+
+            var options = new UpdateOptions { IsUpsert = true };
+
             try
             {
-                await _sessionCollection.InsertOneAsync(sessionEntry);
-                Console.WriteLine("Session inserted successfully.");
+                await _sessionCollection.UpdateOneAsync(filter, update, options);
+                Console.WriteLine("Session updated successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to insert session: {ex.Message}");
+                Console.WriteLine($"Failed to update session: {ex.Message}");
             }
 
 
             return result!;
+        }
+
+
+        private ChatMessage? SearchNestedQuery(ChatMessage message, string query)
+        {
+            if (message.Query.Equals(query, StringComparison.OrdinalIgnoreCase))
+                return message;
+
+            if (message.Options != null)
+            {
+                foreach (var option in message.Options)
+                {
+                    var found = SearchNestedQuery(option.Query, query);
+                    if (found != null)
+                        return found;
+                }
+            }
+
+            return null;
+        }
+
+        public async Task<ChatSession?> GetSessionByIdAsync(string sessionId)
+        {
+            return await _sessionCollection.Find(s => s.SessionId == sessionId).FirstOrDefaultAsync();
         }
 
 

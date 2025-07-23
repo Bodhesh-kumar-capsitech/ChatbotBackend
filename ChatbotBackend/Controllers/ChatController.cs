@@ -15,49 +15,96 @@ namespace ChatbotBackend.Controllers
             _chatService = chatService;
         }
 
-       [HttpGet("reply")]
-public async Task<Apiresponse<object>> GetReply(string query, [FromQuery] string? sessionId = null)
-{
-    var res = new Apiresponse<object>();
-    try
-    {
-        // Generate new session ID if not provided
-        sessionId ??= Guid.NewGuid().ToString();
-
-        // Modified GetByQueryAsync to include session logging
-        var result = await _chatService.GetByQueryAsync(query, sessionId);
-
-        if (result == null)
+        [HttpGet("reply")]
+        public async Task<Apiresponse<object>> GetReply(string query, [FromQuery] string? sessionId = null)
         {
-            res.Message = "Sorry, I couldn't find an answer for that.";
-            res.Status = false;
-            res.Result = new
+            var res = new Apiresponse<object>();
+
+            try
             {
-                SessionId = sessionId,
-                Reply = "Sorry, I couldn't find an answer for that.",
-                Options = Array.Empty<object>()
-            };
+                // Ensure sessionId is valid (generate only if empty or whitespace)
+                if (string.IsNullOrWhiteSpace(sessionId))
+                {
+                    sessionId = Guid.NewGuid().ToString();
+                }
+
+                // Get the response using chat service
+                var result = await _chatService.GetByQueryAsync(query, sessionId);
+
+                if (result == null)
+                {
+                    res.Message = "Sorry, I couldn't find an answer for that.";
+                    res.Status = false;
+                    res.Result = new
+                    {
+                        SessionId = sessionId,
+                        Reply = "Sorry, I couldn't find an answer for that.",
+                        Options = Array.Empty<object>()
+                    };
+                    return res;
+                }
+
+                res.Message = "Reply found successfully.";
+                res.Status = true;
+                res.Result = new
+                {
+                    SessionId = sessionId,
+                    Reply = result.Reply,
+                    Options = result.Options
+                };
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Error: " + ex.Message;
+                res.Status = false;
+                res.Result = null;
+            }
+
             return res;
         }
 
-        res.Message = "Reply found successfully.";
-        res.Status = true;
-        res.Result = new
+        [HttpPost("history")]
+        public async Task<Apiresponse<object>> GetSessionHistory([FromBody] SessionRequest request)
         {
-            SessionId = sessionId,
-            Reply = result.Reply,
-            Options = result.Options
-        };
-    }
-    catch (Exception ex)
-    {
-        res.Message = "Error: " + ex.Message;
-        res.Status = false;
-        res.Result = null;
-    }
+            var res = new Apiresponse<object>();
 
-    return res;
-}
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.SessionId))
+                {
+                    res.Message = "Session ID is required.";
+                    res.Status = false;
+                    return res;
+                }
+
+                var session = await _chatService.GetSessionByIdAsync(request.SessionId);
+
+                if (session == null)
+                {
+                    res.Message = "Session not found.";
+                    res.Status = false;
+                    return res;
+                }
+
+                res.Message = "Conversation history retrieved successfully.";
+                res.Status = true;
+                res.Result = new
+                {
+                    SessionId = session.SessionId,
+                    Conversation = session.Conversation.OrderBy(c => c.Timestamp)
+                };
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Error: " + ex.Message;
+                res.Status = false;
+                res.Result = null;
+            }
+
+            return res;
+        }
+
+
 
 
     }
