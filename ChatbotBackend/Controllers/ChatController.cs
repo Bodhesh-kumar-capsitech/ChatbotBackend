@@ -114,7 +114,6 @@ namespace ChatbotBackend.Controllers
             {
                 string sessionId = Guid.NewGuid().ToString();
 
-                // ✅ Use the service method instead of _chatCollection
                 var rootQueries = await _chatService.GetAllTopLevelQueriesAsync();
 
                 res.Status = true;
@@ -122,7 +121,7 @@ namespace ChatbotBackend.Controllers
                 res.Result = new
                 {
                     sessionId,
-                    reply = "Hi! Select one of the options to begin:",
+                    reply = "Hi! Hou Can I help You?",
                     defaultQueries = rootQueries
                 };
             }
