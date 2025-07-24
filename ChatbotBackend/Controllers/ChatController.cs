@@ -40,7 +40,7 @@ namespace ChatbotBackend.Controllers
                         SessionId = sessionId,
                         Reply = "Sorry, I couldn't find an answer for that.",
                         Options = Array.Empty<object>()
-                    };
+                    };  
                     return res;
                 }
 
@@ -99,6 +99,38 @@ namespace ChatbotBackend.Controllers
                 res.Message = "Error: " + ex.Message;
                 res.Status = false;
                 res.Result = null;
+            }
+
+            return res;
+        }
+
+
+        [HttpGet("start")]
+        public async Task<Apiresponse<object>> StartChat()
+        {
+            var res = new Apiresponse<object>();
+
+            try
+            {
+                string sessionId = Guid.NewGuid().ToString();
+
+                // ✅ Use the service method instead of _chatCollection
+                var rootQueries = await _chatService.GetAllTopLevelQueriesAsync();
+
+                res.Status = true;
+                res.Message = "Session started";
+                res.Result = new
+                {
+                    sessionId,
+                    reply = "Hi! Select one of the options to begin:",
+                    defaultQueries = rootQueries
+                };
+            }
+            catch (Exception ex)
+            {
+                res.Status = false;
+                res.Message = "Error starting chat";
+                res.Result = ex.Message;
             }
 
             return res;

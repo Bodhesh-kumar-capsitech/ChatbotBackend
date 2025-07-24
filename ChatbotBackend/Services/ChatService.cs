@@ -117,5 +117,12 @@ namespace ChatbotBackend.Services
                 await _chatCollection.InsertManyAsync(messages);
             }
         }
+        public async Task<List<string>> GetAllTopLevelQueriesAsync()
+        {
+            return await _chatCollection
+                .Find(_ => true)
+                .Project(x => x.Query)
+                .ToListAsync();
+        }
     }
 }
