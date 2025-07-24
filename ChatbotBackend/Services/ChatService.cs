@@ -74,7 +74,6 @@ namespace ChatbotBackend.Services
             try
             {
                 await _sessionCollection.UpdateOneAsync(filter, update, options);
-                Console.WriteLine("Session updated successfully.");
             }
             catch (Exception ex)
             {
