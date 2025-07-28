@@ -11,8 +11,8 @@ namespace ChatbotBackend.Models
 
         public string SessionId { get; set; } = string.Empty;
 
-        public string Query { get; set; } = string.Empty;
-        public string Reply { get; set; } = string.Empty;
+        public string Question { get; set; } = string.Empty;
+        public string Answer { get; set; } = string.Empty;
         public List<ChatOption> Options { get; set; } = new();
     }
 

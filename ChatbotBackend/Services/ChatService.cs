@@ -32,7 +32,7 @@ namespace ChatbotBackend.Services
 
             // Try direct match first
             var result = await _chatCollection
-                .Find(x => x.Query.ToLowerInvariant() == query.ToLowerInvariant())
+                .Find(x => x.Question.ToLowerInvariant() == query.ToLowerInvariant())
                 .FirstOrDefaultAsync();
 
             // If not found, search recursively through nested options
@@ -48,7 +48,7 @@ namespace ChatbotBackend.Services
                 }
             }
 
-            var reply = result?.Reply ?? "Sorry, I couldn't find an answer for that.";
+            var reply = result?.Answer ?? "Sorry, I couldn't find an answer for that.";
 
             // Log the session
             var filter = Builders<ChatSession>.Filter.Eq(s => s.SessionId, sessionId);
@@ -87,14 +87,33 @@ namespace ChatbotBackend.Services
 
         private ChatMessage? SearchNestedQuery(ChatMessage message, string query)
         {
-            if (message.Query.Equals(query, StringComparison.OrdinalIgnoreCase))
+            if (message.Question.Equals(query, StringComparison.OrdinalIgnoreCase))
                 return message;
 
             if (message.Options != null)
             {
                 foreach (var option in message.Options)
                 {
-                    var found = SearchNestedQuery(option.Query, query);
+                    if (option.Question.Equals(query, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Wrap option into ChatMessage-like structure
+                        return new ChatMessage
+                        {
+                            Question = option.Question,
+                            Answer = option.Answer,
+                            Options = option.Options
+                        };
+                    }
+
+                    // Recursively check deeper nested options
+                    var nested = new ChatMessage
+                    {
+                        Question = option.Question,
+                        Answer = option.Answer,
+                        Options = option.Options
+                    };
+
+                    var found = SearchNestedQuery(nested, query);
                     if (found != null)
                         return found;
                 }
@@ -102,6 +121,7 @@ namespace ChatbotBackend.Services
 
             return null;
         }
+
 
         public async Task<ChatSession?> GetSessionByIdAsync(string sessionId)
         {
@@ -121,7 +141,7 @@ namespace ChatbotBackend.Services
         {
             return await _chatCollection
                 .Find(_ => true)
-                .Project(x => x.Query)
+                .Project(x => x.Question)
                 .ToListAsync();
         }
     }

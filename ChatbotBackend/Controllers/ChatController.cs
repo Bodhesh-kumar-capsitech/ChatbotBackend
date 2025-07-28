@@ -38,7 +38,7 @@ namespace ChatbotBackend.Controllers
                     res.Result = new
                     {
                         SessionId = sessionId,
-                        Reply = "Sorry, I couldn't find an answer for that.",
+                        Answer = "Sorry, I couldn't find an answer for that.",
                         Options = Array.Empty<object>()
                     };  
                     return res;
@@ -49,7 +49,7 @@ namespace ChatbotBackend.Controllers
                 res.Result = new
                 {
                     SessionId = sessionId,
-                    Reply = result.Reply,
+                    Reply = result.Answer,
                     Options = result.Options
                 };
             }
