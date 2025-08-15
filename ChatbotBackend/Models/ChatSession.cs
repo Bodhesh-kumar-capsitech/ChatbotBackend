@@ -24,6 +24,10 @@ namespace ChatbotBackend.Models
         [BsonElement("SessionId")]
         public string SessionId { get; set; } = string.Empty;
 
+        [BsonElement("Humanchat")]
+        public bool IsHumanChat { get; set; } = false;
+
+
         [BsonElement("Conversation")]
         public List<ChatTurn> Conversation { get; set; } = new();
     }
